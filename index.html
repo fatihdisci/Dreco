@@ -555,6 +555,7 @@ const SCOPES    = 'https://www.googleapis.com/auth/drive.file https://www.google
 const MONTHS_TR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
+const TOKEN_STORAGE_KEY = 'evrakTakip.token';
 let tokenClient;
 let accessToken  = null;
 let tokenExpiry  = 0;
@@ -564,18 +565,47 @@ let selectedFile   = null;
 let currentMonthKey = null;
 let rootFolderId   = null;
 
+function persistToken() {
+  try {
+    localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify({ accessToken, tokenExpiry }));
+  } catch (_) {}
+}
+function loadStoredToken() {
+  try {
+    const raw = localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (!raw) return false;
+    const { accessToken: t, tokenExpiry: e } = JSON.parse(raw);
+    if (t && e && Date.now() < e) {
+      accessToken = t;
+      tokenExpiry = e;
+      return true;
+    }
+  } catch (_) {}
+  return false;
+}
+function clearStoredToken() {
+  try { localStorage.removeItem(TOKEN_STORAGE_KEY); } catch (_) {}
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
   const now = new Date();
   currentMonthKey = toMonthKey(now);
-  
+
+  const boot = () => {
+    initGIS();
+    if (loadStoredToken()) {
+      onSignIn();
+    }
+  };
+
   // Google objesi sayfada zaten var mı kontrol et
   if (window.google && window.google.accounts) {
-    initGIS();
+    boot();
   } else {
     // Yoksa script'in yüklenmesini bekle
     const gsiScript = document.querySelector('script[src*="gsi"]');
-    if (gsiScript) gsiScript.addEventListener('load', initGIS);
+    if (gsiScript) gsiScript.addEventListener('load', boot);
   }
 });
 
@@ -591,6 +621,7 @@ function initGIS() {
       }
       accessToken = response.access_token;
       tokenExpiry = Date.now() + response.expires_in * 1000 - 90000;
+      persistToken();
       if (pendingResolve) { pendingResolve(true); pendingResolve = null; }
       else { onSignIn(); }
     }
@@ -608,8 +639,9 @@ function signIn() {
 
 function confirmSignOut() {
   if (!confirm('Çıkış yapmak istiyor musunuz?')) return;
-  google.accounts.oauth2.revoke(accessToken, () => {});
-  accessToken = null; rootFolderId = null;
+  if (accessToken) google.accounts.oauth2.revoke(accessToken, () => {});
+  accessToken = null; tokenExpiry = 0; rootFolderId = null;
+  clearStoredToken();
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('mainScreen').style.display  = 'none';
   document.getElementById('fab').style.display = 'none';
@@ -617,10 +649,18 @@ function confirmSignOut() {
 
 async function ensureToken() {
   if (accessToken && Date.now() < tokenExpiry) return;
-  await new Promise(resolve => {
+  const ok = await new Promise(resolve => {
     pendingResolve = resolve;
     tokenClient.requestAccessToken({ prompt: '' });
   });
+  if (!ok) {
+    accessToken = null; tokenExpiry = 0;
+    clearStoredToken();
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainScreen').style.display  = 'none';
+    document.getElementById('fab').style.display = 'none';
+    throw new Error('Oturum süresi doldu, tekrar giriş yapın');
+  }
 }
 
 async function onSignIn() {
@@ -971,8 +1011,11 @@ async function generatePdf(type) {
       pdf.text(`${i+1} / ${files.length}`, 210-mg, 293, { align:'right' });
     }
 
-    pdf.save(`${type}_${mName}_${year}.pdf`);
-    showToast(`✓ PDF indirildi (${files.length} evrak)`, 'success');
+    const filename = `${type}_${mName}_${year}.pdf`;
+    const blob = pdf.output('blob');
+    await savePdfBlob(blob, filename);
+    showToast(`✓ PDF hazır (${files.length} evrak)`, 'success');
+    closePdfModal();
   } catch(e) {
     console.error(e);
     showToast('PDF oluşturulamadı: ' + e.message, 'error');
@@ -988,6 +1031,32 @@ function blobToDataUrl(blob) {
 }
 function imgDims(src) {
   return new Promise(res => { const i = new Image(); i.onload = () => res({w:i.width, h:i.height}); i.src = src; });
+}
+
+async function savePdfBlob(blob, filename) {
+  // Mobilde Web Share API: Dosyalar / Drive / başka uygulamaya kaydetmeye izin verir
+  // ve yeni sekme açmaz (geri tuşu sorununu önler).
+  try {
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === 'AbortError') return; // kullanıcı iptal etti
+    // diğer hatalarda indirme yöntemine düş
+  }
+
+  // Masaüstü ve fallback: <a download> ile aynı sekmede indir
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
