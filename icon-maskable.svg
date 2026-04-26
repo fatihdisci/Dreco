@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Full bleed yellow background (Android will mask) -->
+  <rect width="512" height="512" fill="#fde047"/>
+  <!-- Subtle grid -->
+  <g stroke="#fcd34d" stroke-width="2" opacity="0.9">
+    <path d="M0 64h512M0 128h512M0 192h512M0 256h512M0 320h512M0 384h512M0 448h512"/>
+    <path d="M64 0v512M128 0v512M192 0v512M256 0v512M320 0v512M384 0v512M448 0v512"/>
+  </g>
+
+  <!-- Document card centered in safe zone (~ inner 80%) -->
+  <g transform="translate(140 132) rotate(-4 116 124)">
+    <rect x="16" y="16" width="232" height="248" rx="16" fill="#000"/>
+    <rect x="0"  y="0"  width="232" height="248" rx="16" fill="#ffffff" stroke="#000" stroke-width="11"/>
+
+    <rect x="16" y="20" width="200" height="26" rx="7" fill="#fde047" stroke="#000" stroke-width="5"/>
+
+    <rect x="22" y="72"  width="188" height="16" rx="5" fill="#000"/>
+    <rect x="22" y="102" width="132" height="16" rx="5" fill="#000"/>
+    <rect x="22" y="132" width="160" height="16" rx="5" fill="#000"/>
+
+    <g transform="translate(20 168)">
+      <rect x="0" y="0" width="86" height="58" rx="9" fill="#4ade80" stroke="#000" stroke-width="5"/>
+      <path d="M43 42 V18 M30 30 L43 17 L56 30" stroke="#000" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+    <g transform="translate(126 168)">
+      <rect x="0" y="0" width="86" height="58" rx="9" fill="#f87171" stroke="#000" stroke-width="5"/>
+      <path d="M43 17 V41 M30 28 L43 42 L56 28" stroke="#000" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Yellow background tile -->
+  <rect width="512" height="512" rx="96" fill="#fde047"/>
+  <!-- Subtle grid -->
+  <g stroke="#fcd34d" stroke-width="2" opacity="0.9">
+    <path d="M0 64h512M0 128h512M0 192h512M0 256h512M0 320h512M0 384h512M0 448h512"/>
+    <path d="M64 0v512M128 0v512M192 0v512M256 0v512M320 0v512M384 0v512M448 0v512"/>
+  </g>
+  <!-- Outer black frame -->
+  <rect x="14" y="14" width="484" height="484" rx="84" fill="none" stroke="#000" stroke-width="22"/>
+
+  <!-- Document card with hard offset shadow -->
+  <g transform="translate(96 88) rotate(-4 160 168)">
+    <!-- Hard shadow -->
+    <rect x="22" y="22" width="320" height="336" rx="20" fill="#000"/>
+    <!-- Paper -->
+    <rect x="0" y="0" width="320" height="336" rx="20" fill="#ffffff" stroke="#000" stroke-width="14"/>
+
+    <!-- Top stripe -->
+    <rect x="22" y="28" width="276" height="36" rx="10" fill="#fde047" stroke="#000" stroke-width="6"/>
+
+    <!-- Lines -->
+    <rect x="32"  y="100" width="256" height="22" rx="6" fill="#000"/>
+    <rect x="32"  y="142" width="184" height="22" rx="6" fill="#000"/>
+    <rect x="32"  y="184" width="220" height="22" rx="6" fill="#000"/>
+
+    <!-- Up arrow (gelir) badge -->
+    <g transform="translate(28 232)">
+      <rect x="0" y="0" width="120" height="78" rx="12" fill="#4ade80" stroke="#000" stroke-width="7"/>
+      <path d="M60 56 V24 M44 38 L60 22 L76 38" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+
+    <!-- Down arrow (gider) badge -->
+    <g transform="translate(168 232)">
+      <rect x="0" y="0" width="120" height="78" rx="12" fill="#f87171" stroke="#000" stroke-width="7"/>
+      <path d="M60 22 V54 M44 40 L60 56 L76 40" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+  </g>
+</svg>
