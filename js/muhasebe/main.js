@@ -1,9 +1,6 @@
-import { state } from './state.js';
-import { toMonthKey } from './utils.js';
-import {
-  initGIS, signIn, confirmSignOut, loadStoredToken,
-} from './auth.js';
-import { fetchUserInfo } from './drive.js';
+import { state } from '../shared/state.js';
+import { toMonthKey } from '../shared/utils.js';
+import { initGIS, confirmSignOut, loadStoredToken, fetchUserInfo } from '../shared/auth.js';
 import {
   buildMonthBar, buildPdfSel, loadFiles,
   openAddModal, closeAddModal, triggerCamera, triggerGallery,
@@ -20,17 +17,12 @@ async function onSignIn() {
     av.title = `${p.name} — Çıkış için tıklayın`;
   } catch (_) {}
 
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('mainScreen').style.display  = 'block';
-  document.getElementById('fab').style.display = 'flex';
-
   buildMonthBar();
   buildPdfSel();
   await loadFiles();
 }
 
 function bindEvents() {
-  document.getElementById('loginBtn').addEventListener('click', signIn);
   document.getElementById('headerPdfBtn').addEventListener('click', openPdfModal);
   document.getElementById('userAvatar').addEventListener('click', confirmSignOut);
   document.getElementById('fab').addEventListener('click', openAddModal);
@@ -58,7 +50,11 @@ function bindEvents() {
 
 function boot() {
   initGIS(onSignIn);
-  if (loadStoredToken()) onSignIn();
+  if (loadStoredToken()) {
+    onSignIn();
+  } else {
+    location.href = 'index.html';
+  }
 }
 
 window.addEventListener('load', () => {

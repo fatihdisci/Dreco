@@ -1,7 +1,7 @@
-import { ROOT_FOLDER_NAME } from './config.js';
-import { state } from './state.js';
-import { ensureToken } from './auth.js';
-import { enc, monthLabel } from './utils.js';
+import { ROOT_FOLDER_NAME } from '../shared/config.js';
+import { state } from '../shared/state.js';
+import { ensureToken } from '../shared/auth.js';
+import { enc, monthLabel } from '../shared/utils.js';
 
 async function driveReq(url, opts = {}) {
   await ensureToken();
@@ -74,11 +74,4 @@ export async function uploadFile(blob, folderId, name) {
 export async function downloadBlob(fileId) {
   const r = await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
   return r.blob();
-}
-
-export async function fetchUserInfo() {
-  const r = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-    headers: { Authorization: `Bearer ${state.accessToken}` },
-  });
-  return r.json();
 }

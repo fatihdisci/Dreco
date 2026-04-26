@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Evrak Takip</title>
+  <title>Asistan Hub</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Evrak">
+  <meta name="apple-mobile-web-app-title" content="Hub">
   <meta name="theme-color" content="#fef3c7">
 
   <link rel="manifest" href="manifest.webmanifest">
@@ -30,8 +30,8 @@
         <path d="M35 27v3.5l2 1.5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div class="logo-title">Evrak Takip</div>
-    <div class="logo-sub">Gelir &amp; gider evraklarınızı Drive'da düzenli saklayın</div>
+    <div class="logo-title">Asistan Hub</div>
+    <div class="logo-sub">Kişisel araç setiniz — Drive ve YouTube'da tek yerden</div>
   </div>
   <button class="login-btn" id="loginBtn">
     <svg width="22" height="22" viewBox="0 0 24 24">
@@ -44,188 +44,78 @@
   </button>
 </div>
 
-<!-- ── MAIN ─────────────────────────────────────────────────────────────── -->
-<div id="mainScreen">
+<!-- ── HUB ─────────────────────────────────────────────────────────────── -->
+<div id="hubScreen" style="display:none">
   <div class="header">
     <div class="header-left">
       <div class="header-icon">
-        <svg width="22" height="22" fill="none" viewBox="0 0 20 20">
-          <path d="M3 6h14M3 10h9M3 14h11" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+        <svg width="22" height="22" fill="none" viewBox="0 0 22 22">
+          <rect x="3"  y="3"  width="7" height="7" rx="1.5" stroke="#000" stroke-width="2.5"/>
+          <rect x="12" y="3"  width="7" height="7" rx="1.5" stroke="#000" stroke-width="2.5"/>
+          <rect x="3"  y="12" width="7" height="7" rx="1.5" stroke="#000" stroke-width="2.5"/>
+          <rect x="12" y="12" width="7" height="7" rx="1.5" stroke="#000" stroke-width="2.5"/>
         </svg>
       </div>
-      <span class="header-title">Evrak Takip</span>
+      <span class="header-title">Asistan Hub</span>
     </div>
     <div class="header-right">
-      <button class="pdf-btn" id="headerPdfBtn">
-        <svg width="14" height="14" fill="none" viewBox="0 0 13 13">
-          <path d="M6.5 1.5v7M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M1.5 10.5h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        PDF
-      </button>
       <img id="userAvatar" src="" alt="Kullanıcı" class="user-avatar" title="Çıkış yapmak için tıklayın">
     </div>
   </div>
 
-  <div class="month-bar" id="monthBar"></div>
+  <div class="hub-greet" id="hubGreet">Merhaba</div>
+  <div class="hub-sub">Bir modül seç</div>
 
-  <div class="stats-row">
-    <div class="stat-card gelir-card">
-      <div class="stat-label">
-        <div class="stat-dot" style="background:var(--gelir)"></div>
-        Gelir
-      </div>
-      <div class="stat-count" id="gelirCount">—</div>
-      <div class="stat-sub">bu ayın evrakları</div>
-    </div>
-    <div class="stat-card gider-card">
-      <div class="stat-label">
-        <div class="stat-dot" style="background:var(--gider)"></div>
-        Gider
-      </div>
-      <div class="stat-count" id="giderCount">—</div>
-      <div class="stat-sub">bu ayın evrakları</div>
-    </div>
-  </div>
-
-  <div class="section-title">Evraklar</div>
-  <div class="files-grid" id="filesGrid">
-    <div class="empty-state">
-      <div class="empty-icon">
-        <svg width="32" height="32" fill="none" viewBox="0 0 32 32">
-          <rect x="6" y="4" width="20" height="24" rx="2" stroke="#000" stroke-width="2.5"/>
-          <path d="M10 12h12M10 17h8" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
+  <div class="hub-grid">
+    <a class="module-card mc-yellow" href="muhasebe.html">
+      <div class="mc-icon">
+        <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
+          <rect x="6" y="4" width="26" height="32" rx="3" fill="#fff" stroke="#000" stroke-width="2.5"/>
+          <rect x="10" y="9" width="18" height="3" rx="1" fill="#fde047" stroke="#000" stroke-width="1.5"/>
+          <rect x="10" y="16" width="18" height="2" rx="1" fill="#000"/>
+          <rect x="10" y="20" width="14" height="2" rx="1" fill="#000"/>
+          <rect x="10" y="24" width="16" height="2" rx="1" fill="#000"/>
+          <rect x="10" y="29" width="7" height="4" rx="1" fill="#4ade80" stroke="#000" stroke-width="1.2"/>
+          <rect x="22" y="29" width="7" height="4" rx="1" fill="#f87171" stroke="#000" stroke-width="1.2"/>
         </svg>
       </div>
-      <div class="empty-title">Yükleniyor...</div>
-    </div>
+      <div class="mc-text">
+        <div class="mc-title">Muhasebe</div>
+        <div class="mc-sub">Gelir &amp; gider evrakları</div>
+      </div>
+      <div class="mc-arrow">
+        <svg width="22" height="22" fill="none" viewBox="0 0 22 22">
+          <path d="M7 4l8 7-8 7" stroke="#000" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </a>
+
+    <a class="module-card mc-pink" href="youtube.html">
+      <div class="mc-icon">
+        <svg width="40" height="40" fill="none" viewBox="0 0 40 40">
+          <rect x="3" y="9" width="34" height="22" rx="5" fill="#fff" stroke="#000" stroke-width="2.5"/>
+          <path d="M17 16l8 4-8 4z" fill="#000"/>
+        </svg>
+      </div>
+      <div class="mc-text">
+        <div class="mc-title">YouTube</div>
+        <div class="mc-sub">Kanal istatistikleri &amp; videolar</div>
+      </div>
+      <div class="mc-arrow">
+        <svg width="22" height="22" fill="none" viewBox="0 0 22 22">
+          <path d="M7 4l8 7-8 7" stroke="#000" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </a>
   </div>
+
+  <div class="hub-foot">Daha fazla modül yakında</div>
 </div>
-
-<button class="fab" id="fab" style="display:none" aria-label="Evrak Ekle">
-  <svg width="32" height="32" fill="none" viewBox="0 0 28 28">
-    <path d="M14 5v18M5 14h18" stroke="#000" stroke-width="3.5" stroke-linecap="round"/>
-  </svg>
-</button>
-
-<!-- ── ADD MODAL ────────────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="addOverlay">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">Evrak Ekle</span>
-      <button class="modal-close" id="addModalClose" aria-label="Kapat">
-        <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
-          <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="photo-preview" id="photoPreview">
-        <img id="previewImg" src="" alt="Önizleme">
-        <div class="photo-placeholder" id="previewPlaceholder">
-          <svg width="48" height="48" fill="none" viewBox="0 0 44 44" style="margin:0 auto">
-            <rect x="4" y="10" width="36" height="27" rx="3" stroke="#000" stroke-width="2.5"/>
-            <circle cx="22" cy="23" r="7" stroke="#000" stroke-width="2.5"/>
-            <path d="M15 10l2.5-5h9l2.5 5" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="36" cy="16" r="2" fill="#000"/>
-          </svg>
-          <p>Fotoğraf seçilmedi</p>
-        </div>
-      </div>
-
-      <div class="capture-row">
-        <button class="capture-btn" id="cameraBtn">
-          <svg width="18" height="18" fill="none" viewBox="0 0 17 17">
-            <path d="M13.5 4.5H3.5a1.5 1.5 0 00-1.5 1.5v7a1.5 1.5 0 001.5 1.5h10a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5z" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="8.5" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M6 4.5l1.2-2.5h2.6L11 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Kamera
-        </button>
-        <button class="capture-btn" id="galleryBtn">
-          <svg width="18" height="18" fill="none" viewBox="0 0 17 17">
-            <rect x="2" y="3" width="13" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="6" cy="7" r="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M2 12l3.5-3.5 2.5 2.5 2-2 4.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Galeri
-        </button>
-      </div>
-
-      <div class="type-toggle">
-        <button class="type-btn active-gelir" id="gelirBtn">
-          <svg width="16" height="16" fill="none" viewBox="0 0 15 15">
-            <path d="M7.5 12V3M4 6l3.5-3 3.5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Gelir
-        </button>
-        <button class="type-btn" id="giderBtn">
-          <svg width="16" height="16" fill="none" viewBox="0 0 15 15">
-            <path d="M7.5 3v9M4 9l3.5 3 3.5-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Gider
-        </button>
-      </div>
-
-      <div class="input-group">
-        <div class="input-label">Not (opsiyonel)</div>
-        <input type="text" id="noteInput" class="text-input" placeholder="Yakıt fişi, elektrik faturası, vb.">
-      </div>
-
-      <button class="primary-btn" id="saveBtn">
-        <span id="saveBtnText">Kaydet &amp; Drive'a Yükle</span>
-        <div class="spinner" id="saveSpinner"></div>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ── PDF MODAL ────────────────────────────────────────────────────────── -->
-<div class="modal-overlay" id="pdfOverlay">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <span class="modal-title">PDF İndir</span>
-      <button class="modal-close" id="pdfModalClose" aria-label="Kapat">
-        <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
-          <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="input-group">
-        <div class="input-label">Ay Seç</div>
-        <select id="pdfMonthSel" class="select-input"></select>
-      </div>
-      <button class="pdf-dl-btn gelir" id="gelirPdfBtn">
-        <svg width="18" height="18" fill="none" viewBox="0 0 17 17">
-          <path d="M8.5 2v10M5.5 9l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M2.5 14.5h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <span id="gelirPdfTxt">Gelir PDF İndir</span>
-        <div class="spinner" id="gelirSpin"></div>
-      </button>
-      <button class="pdf-dl-btn gider" id="giderPdfBtn">
-        <svg width="18" height="18" fill="none" viewBox="0 0 17 17">
-          <path d="M8.5 2v10M5.5 9l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M2.5 14.5h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <span id="giderPdfTxt">Gider PDF İndir</span>
-        <div class="spinner" id="giderSpin"></div>
-      </button>
-    </div>
-  </div>
-</div>
-
-<input type="file" id="cameraInput" accept="image/*" capture="environment">
-<input type="file" id="galleryInput" accept="image/*">
 
 <div id="toast"></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/hub/main.js"></script>
 
 </body>
 </html>

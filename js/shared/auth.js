@@ -61,9 +61,15 @@ export function signOutToLogin() {
   state.tokenExpiry = 0;
   state.rootFolderId = null;
   clearStoredToken();
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('mainScreen').style.display  = 'none';
-  document.getElementById('fab').style.display = 'none';
+  // Modüllerden çıkış: hub'a dön. Hub zaten oturum yoksa login ekranı gösterir.
+  const inHub = location.pathname.endsWith('/index.html')
+             || location.pathname.endsWith('/')
+             || location.pathname === '';
+  if (inHub) {
+    location.reload();
+  } else {
+    location.href = 'index.html';
+  }
 }
 
 export function confirmSignOut() {
@@ -72,6 +78,14 @@ export function confirmSignOut() {
     google.accounts.oauth2.revoke(state.accessToken, () => {});
   }
   signOutToLogin();
+}
+
+export async function fetchUserInfo() {
+  const r = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    headers: { Authorization: `Bearer ${state.accessToken}` },
+  });
+  if (!r.ok) throw new Error(`userinfo ${r.status}`);
+  return r.json();
 }
 
 export async function ensureToken() {

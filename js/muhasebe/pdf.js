@@ -1,6 +1,6 @@
-import { MONTHS_TR } from './config.js';
+import { MONTHS_TR } from '../shared/config.js';
 import { findFolder, getRootFolder, listFolder, downloadBlob } from './drive.js';
-import { blobToDataUrl, imgDims, showToast } from './utils.js';
+import { blobToDataUrl, imgDims, showToast } from '../shared/utils.js';
 
 async function savePdfBlob(blob, filename) {
   // Mobilde Web Share API: yeni sekme açmaz, kullanıcı Dosyalar/Drive/diğer

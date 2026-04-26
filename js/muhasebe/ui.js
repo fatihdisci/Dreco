@@ -1,6 +1,6 @@
-import { MONTHS_TR } from './config.js';
-import { state } from './state.js';
-import { toMonthKey, monthLabel, compressImage, showToast } from './utils.js';
+import { MONTHS_TR } from '../shared/config.js';
+import { state } from '../shared/state.js';
+import { toMonthKey, monthLabel, compressImage, showToast } from '../shared/utils.js';
 import { findFolder, getRootFolder, getTypeFolder, listFolder, uploadFile } from './drive.js';
 
 /* ── MONTH BAR ──────────────────────────────────────────────────────────── */

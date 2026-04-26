@@ -1,7 +1,7 @@
 {
-  "name": "Evrak Takip",
-  "short_name": "Evrak",
-  "description": "Gelir & gider evraklarınızı Drive'da düzenli saklayın",
+  "name": "Asistan Hub",
+  "short_name": "Asistan",
+  "description": "Kişisel asistan: Muhasebe, YouTube ve daha fazlası",
   "lang": "tr",
   "start_url": "./index.html",
   "scope": "./",
