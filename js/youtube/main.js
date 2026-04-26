@@ -1,14 +1,14 @@
-import { initGIS, loadStoredToken, confirmSignOut, fetchUserInfo } from '../shared/auth.js';
+import { loadStoredToken, confirmSignOut, fetchUserInfo, initGIS } from '../shared/auth.js';
 import { showToast } from '../shared/utils.js';
-import { getMyChannel, getUploadVideoIds, getVideosByIds } from './api.js';
+import { getChannel, getUploadVideoIds, getVideosByIds } from './api.js';
 import { renderChannelHeader, renderStats, renderLatestVideos, renderTopVideos, showLoading, showError } from './ui.js';
 
 async function loadDashboard() {
   showLoading('Kanal verileri çekiliyor...');
   try {
-    const channel = await getMyChannel();
+    const channel = await getChannel();
     if (!channel) {
-      showError('Bu hesaba bağlı bir YouTube kanalı bulunamadı.');
+      showError('Kanal bulunamadı.');
       return;
     }
     renderChannelHeader(channel);
@@ -31,16 +31,18 @@ async function loadDashboard() {
   }
 }
 
-async function onSignIn() {
+async function showAvatarIfSignedIn() {
+  if (!loadStoredToken()) return;
+  // GIS yüklü değilse sessiz refresh işe yaramaz; sadece avatarı denemek için fetch çağırırız.
   try {
     const p = await fetchUserInfo();
     const av = document.getElementById('userAvatar');
     if (av) {
       av.src = p.picture || '';
       av.title = `${p.name} — Çıkış için tıklayın`;
+      av.style.display = 'inline-block';
     }
   } catch (_) {}
-  await loadDashboard();
 }
 
 function bindEvents() {
@@ -48,21 +50,17 @@ function bindEvents() {
   document.getElementById('refreshBtn').addEventListener('click', () => loadDashboard());
 }
 
-function boot() {
-  initGIS(onSignIn);
-  if (loadStoredToken()) {
-    onSignIn();
-  } else {
-    location.href = 'index.html';
-  }
-}
-
 window.addEventListener('load', () => {
   bindEvents();
-  if (window.google && window.google.accounts) {
-    boot();
-  } else {
+
+  // GIS hazır olunca initGIS — opsiyonel: token yenileme/çıkış için.
+  const onGsiReady = () => initGIS(() => {});
+  if (window.google && window.google.accounts) onGsiReady();
+  else {
     const gsiScript = document.querySelector('script[src*="gsi"]');
-    if (gsiScript) gsiScript.addEventListener('load', boot);
+    if (gsiScript) gsiScript.addEventListener('load', onGsiReady);
   }
+
+  showAvatarIfSignedIn();
+  loadDashboard();
 });
