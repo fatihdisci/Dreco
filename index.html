@@ -655,7 +655,8 @@ async function driveReq(url, opts = {}) {
 }
 
 async function findFolder(name, parentId) {
-  const q = `name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`;
+  let q = `name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+  if (parentId) q += ` and '${parentId}' in parents`;
   const r = await driveReq(`https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=files(id)&pageSize=1`);
   const d = await r.json();
   return d.files.length ? d.files[0].id : null;
