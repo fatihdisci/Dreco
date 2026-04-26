@@ -5,7 +5,7 @@ import {
   buildMonthBar, buildPdfSel, loadFiles,
   openAddModal, closeAddModal, triggerCamera, triggerGallery,
   setType, previewFile, saveEvrak,
-  openPdfModal, closePdfModal,
+  openPdfModal, closePdfModal, openCropper,
 } from './ui.js';
 import { generatePdf } from './pdf.js';
 
@@ -30,6 +30,7 @@ function bindEvents() {
   document.getElementById('addModalClose').addEventListener('click', closeAddModal);
   document.getElementById('cameraBtn').addEventListener('click', triggerCamera);
   document.getElementById('galleryBtn').addEventListener('click', triggerGallery);
+  document.getElementById('cropBtn').addEventListener('click', openCropper);
   document.getElementById('gelirBtn').addEventListener('click', () => setType('gelir'));
   document.getElementById('giderBtn').addEventListener('click', () => setType('gider'));
   document.getElementById('saveBtn').addEventListener('click', saveEvrak);

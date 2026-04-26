@@ -111,7 +111,20 @@
           </svg>
           <p>Fotoğraf seçilmedi</p>
         </div>
+        <span id="croppedBadge" class="cropped-badge" style="display:none">
+          <svg width="12" height="12" fill="none" viewBox="0 0 12 12">
+            <path d="M2 6l3 3 5-6" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Kırpıldı
+        </span>
       </div>
+
+      <button class="capture-btn crop-btn" id="cropBtn" type="button" style="display:none">
+        <svg width="18" height="18" fill="none" viewBox="0 0 18 18">
+          <path d="M5 1v12h12M1 5h12v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Köşeleri Düzelt &amp; Kırp
+      </button>
 
       <div class="capture-row">
         <button class="capture-btn" id="cameraBtn">

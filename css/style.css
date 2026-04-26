@@ -588,6 +588,124 @@ button { font-family: inherit; }
 input[type="file"] { display: none; }
 
 /* =========================================================================
+   CROP — preview-area badge + entry button
+   ========================================================================= */
+.cropped-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--gelir);
+  color: var(--ink);
+  border: var(--b);
+  border-radius: var(--r-sm);
+  padding: 4px 10px;
+  font-size: 11px; font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  display: inline-flex; align-items: center; gap: 6px;
+  box-shadow: var(--sh-sm);
+  z-index: 5;
+}
+
+.crop-btn { background: var(--accent); }
+
+/* =========================================================================
+   CROP — full-screen 4-corner picker overlay
+   ========================================================================= */
+.crop-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, .82);
+  z-index: 300;
+  display: flex; align-items: stretch; justify-content: center;
+}
+.crop-sheet {
+  background: var(--bg);
+  width: 100%;
+  max-width: 480px;
+  display: flex; flex-direction: column;
+  border-left: var(--b-thick);
+  border-right: var(--b-thick);
+}
+.crop-header {
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--paper);
+  border-bottom: var(--b-thick);
+}
+.crop-title {
+  font-size: 18px; font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -.3px;
+}
+.crop-cancel {
+  background: var(--gider);
+  border: var(--b);
+  border-radius: var(--r-sm);
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--sh-sm);
+}
+.crop-cancel:active { transform: translate(2px, 2px); box-shadow: 0 0 0 0 var(--ink); }
+
+.crop-stage {
+  position: relative;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    repeating-conic-gradient(#1a1a1a 0% 25%, #2a2a2a 0% 50%) 50% / 22px 22px;
+}
+.crop-img-wrap {
+  position: absolute; inset: 12px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.crop-img-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.crop-svg {
+  position: absolute; inset: 12px;
+  width: calc(100% - 24px); height: calc(100% - 24px);
+  touch-action: none;
+}
+.crop-dim     { fill: rgba(0, 0, 0, .55); }
+.crop-poly    { fill: none; stroke: #fde047; stroke-width: 4; stroke-dasharray: 12 6; vector-effect: non-scaling-stroke; }
+.crop-handle  { fill: #fde047; stroke: #000; stroke-width: 3; cursor: grab; vector-effect: non-scaling-stroke; }
+.crop-handle:active { cursor: grabbing; fill: #f472b6; }
+
+.crop-actions {
+  padding: 14px 16px;
+  display: grid; grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+  background: var(--paper);
+  border-top: var(--b-thick);
+  padding-bottom: max(env(safe-area-inset-bottom), 14px);
+}
+.crop-reset, .crop-confirm {
+  border: var(--b-thick);
+  border-radius: var(--r-md);
+  padding: 14px;
+  font-family: inherit;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: var(--sh);
+  color: var(--ink);
+  transition: transform .12s, box-shadow .12s;
+}
+.crop-reset   { background: var(--paper); }
+.crop-confirm { background: var(--gelir); }
+.crop-reset:hover, .crop-confirm:hover    { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 0 var(--ink); }
+.crop-reset:active, .crop-confirm:active  { transform: translate(3px, 3px);   box-shadow: 1px 1px 0 0 var(--ink); }
+.crop-confirm:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: var(--sh-sm); }
+
+/* =========================================================================
    BACK BUTTON (in module headers)
    ========================================================================= */
 .back-btn {

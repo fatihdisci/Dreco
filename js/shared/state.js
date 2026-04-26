@@ -5,6 +5,7 @@ export const state = {
   pendingResolve:  null,
   currentType:     'gelir',
   selectedFile:    null,
+  croppedBlob:     null,
   currentMonthKey: null,
   rootFolderId:    null,
 };

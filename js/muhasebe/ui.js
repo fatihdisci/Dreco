@@ -2,6 +2,7 @@ import { MONTHS_TR } from '../shared/config.js';
 import { state } from '../shared/state.js';
 import { toMonthKey, monthLabel, compressImage, showToast } from '../shared/utils.js';
 import { findFolder, getRootFolder, getTypeFolder, listFolder, uploadFile } from './drive.js';
+import { runCropper } from './crop.js';
 
 /* ── MONTH BAR ──────────────────────────────────────────────────────────── */
 export function buildMonthBar() {
@@ -120,6 +121,16 @@ function renderGrid(gelirFiles, giderFiles) {
 }
 
 /* ── ADD MODAL ──────────────────────────────────────────────────────────── */
+function setCropBtnVisibility(visible) {
+  const btn = document.getElementById('cropBtn');
+  if (btn) btn.style.display = visible ? 'flex' : 'none';
+}
+
+function setCroppedBadge(visible) {
+  const b = document.getElementById('croppedBadge');
+  if (b) b.style.display = visible ? 'inline-flex' : 'none';
+}
+
 export function openAddModal() {
   document.getElementById('addOverlay').classList.add('open');
   document.getElementById('previewImg').style.display = 'none';
@@ -128,6 +139,9 @@ export function openAddModal() {
   document.getElementById('cameraInput').value = '';
   document.getElementById('galleryInput').value = '';
   state.selectedFile = null;
+  state.croppedBlob  = null;
+  setCropBtnVisibility(false);
+  setCroppedBadge(false);
   setType('gelir');
 }
 
@@ -144,17 +158,32 @@ export function setType(t) {
   document.getElementById('giderBtn').className = 'type-btn' + (t === 'gider' ? ' active-gider' : '');
 }
 
+function showPreviewFromBlobOrFile(source) {
+  const img = document.getElementById('previewImg');
+  const url = URL.createObjectURL(source);
+  img.onload = () => URL.revokeObjectURL(url);
+  img.src = url;
+  img.style.display = 'block';
+  document.getElementById('previewPlaceholder').style.display = 'none';
+}
+
 export function previewFile(file) {
   if (!file) return;
   state.selectedFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById('previewImg');
-    img.src = e.target.result;
-    img.style.display = 'block';
-    document.getElementById('previewPlaceholder').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+  state.croppedBlob  = null;
+  setCroppedBadge(false);
+  setCropBtnVisibility(true);
+  showPreviewFromBlobOrFile(file);
+}
+
+export async function openCropper() {
+  if (!state.selectedFile) { showToast('Önce fotoğraf seçin', 'error'); return; }
+  // Always crop from the original file so corners stay accurate across re-crops
+  const result = await runCropper(state.selectedFile);
+  if (!result) return; // cancelled
+  state.croppedBlob = result;
+  setCroppedBadge(true);
+  showPreviewFromBlobOrFile(result);
 }
 
 export async function saveEvrak() {
@@ -170,10 +199,14 @@ export async function saveEvrak() {
     const mKey   = toMonthKey(now);
     const note   = document.getElementById('noteInput').value.trim();
     const ts     = now.toISOString().slice(0, 19).replace(/:/g, '-');
-    const ext    = state.selectedFile.type.includes('png') ? 'png' : 'jpg';
-    const name   = note ? `${ts}_${note}.${ext}` : `${ts}.${ext}`;
+    // Cropped output is always JPEG; original may be PNG
+    const isCropped = !!state.croppedBlob;
+    const ext   = isCropped ? 'jpg' : (state.selectedFile.type.includes('png') ? 'png' : 'jpg');
+    const name  = note ? `${ts}_${note}.${ext}` : `${ts}.${ext}`;
     const folder = await getTypeFolder(state.currentType, mKey);
-    const blob   = await compressImage(state.selectedFile, 1400);
+    const blob   = isCropped
+      ? await compressImage(state.croppedBlob, 1600)
+      : await compressImage(state.selectedFile, 1400);
     await uploadFile(blob, folder, name);
     showToast('✓ Drive\'a yüklendi', 'success');
     closeAddModal();
