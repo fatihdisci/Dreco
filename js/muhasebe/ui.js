@@ -133,6 +133,9 @@ function setCroppedBadge(visible) {
 
 export function openAddModal() {
   document.getElementById('addOverlay').classList.add('open');
+  if (state.currentMonthKey) {
+    showToast(`Yükleme hedefi: ${monthLabel(state.currentMonthKey)}`);
+  }
   document.getElementById('previewImg').style.display = 'none';
   document.getElementById('previewPlaceholder').style.display = 'block';
   document.getElementById('noteInput').value = '';
@@ -167,6 +170,17 @@ function showPreviewFromBlobOrFile(source) {
   document.getElementById('previewPlaceholder').style.display = 'none';
 }
 
+
+function sanitizeFilenamePart(input) {
+  return String(input || '')
+    .normalize('NFKC')
+    .replace(/[\\/:*?"<>|#%{}~&]/g, '-')
+    .replace(/\s+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^[-_.]+|[-_.]+$/g, '')
+    .slice(0, 80);
+}
+
 export function previewFile(file) {
   if (!file) return;
   state.selectedFile = file;
@@ -196,8 +210,9 @@ export async function saveEvrak() {
   spinner.style.display = 'block';
   try {
     const now    = new Date();
-    const mKey   = toMonthKey(now);
-    const note   = document.getElementById('noteInput').value.trim();
+    const mKey   = state.currentMonthKey || toMonthKey(now);
+    const rawNote = document.getElementById('noteInput').value.trim();
+    const note   = sanitizeFilenamePart(rawNote);
     const ts     = now.toISOString().slice(0, 19).replace(/:/g, '-');
     // Cropped output is always JPEG; original may be PNG
     const isCropped = !!state.croppedBlob;

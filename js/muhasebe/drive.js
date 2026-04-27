@@ -3,6 +3,30 @@ import { state } from '../shared/state.js';
 import { ensureToken } from '../shared/auth.js';
 import { enc, monthLabel } from '../shared/utils.js';
 
+
+async function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function withRetry(fn, { retries = 2, baseDelay = 350 } = {}) {
+  let attempt = 0;
+  let lastErr;
+  while (attempt <= retries) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const msg = String(err?.message || '');
+      const isRetryable = /Drive\s(429|500|502|503|504):/.test(msg);
+      if (!isRetryable || attempt === retries) break;
+      const jitter = Math.floor(Math.random() * 140);
+      await wait(baseDelay * (2 ** attempt) + jitter);
+      attempt += 1;
+    }
+  }
+  throw lastErr;
+}
+
 async function driveReq(url, opts = {}) {
   await ensureToken();
   const res = await fetch(url, {
@@ -52,11 +76,13 @@ export async function getTypeFolder(type, monthKey) {
 }
 
 export async function listFolder(folderId) {
-  const q = `'${folderId}' in parents and trashed=false`;
-  const r = await driveReq(
-    `https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=files(id,name,createdTime,thumbnailLink)&orderBy=createdTime&pageSize=200`
-  );
-  return (await r.json()).files || [];
+  return withRetry(async () => {
+    const q = `'${folderId}' in parents and trashed=false`;
+    const r = await driveReq(
+      `https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=files(id,name,createdTime,thumbnailLink)&orderBy=createdTime&pageSize=200`
+    );
+    return (await r.json()).files || [];
+  });
 }
 
 export async function uploadFile(blob, folderId, name) {

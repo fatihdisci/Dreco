@@ -52,17 +52,3 @@ export async function getVideosByIds(ids) {
   }
   return out;
 }
-
-export async function getRecentComments(max = 20) {
-  try {
-    const data = await ytGet('/commentThreads', {
-      part: 'snippet',
-      allThreadsRelatedToChannelId: YT_CHANNEL_ID,
-      order: 'time',
-      maxResults: String(Math.min(max, 50)),
-    });
-    return data.items || [];
-  } catch (_) {
-    return [];
-  }
-}
