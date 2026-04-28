@@ -6,6 +6,7 @@ import {
   openAddModal, closeAddModal, triggerCamera, triggerGallery,
   setType, previewFile, saveEvrak,
   openPdfModal, closePdfModal, openCropper,
+  closeDetailModal, openRenameModal, closeRenameModal, submitRename, openFileInDrive, deleteFileFromDetail,
 } from './ui.js';
 import { generatePdf } from './pdf.js';
 
@@ -47,6 +48,26 @@ function bindEvents() {
 
   const pdfOverlay = document.getElementById('pdfOverlay');
   pdfOverlay.addEventListener('click', e => { if (e.target === pdfOverlay) closePdfModal(); });
+
+  document.getElementById('detailModalClose').addEventListener('click', closeDetailModal);
+  document.getElementById('detailRenameBtn').addEventListener('click', openRenameModal);
+  document.getElementById('detailOpenDriveBtn').addEventListener('click', openFileInDrive);
+  document.getElementById('detailDeleteBtn').addEventListener('click', deleteFileFromDetail);
+  document.getElementById('renameModalClose').addEventListener('click', closeRenameModal);
+  document.getElementById('renameCancelBtn').addEventListener('click', closeRenameModal);
+  document.getElementById('renameSaveBtn').addEventListener('click', submitRename);
+
+  const detailOverlay = document.getElementById('detailOverlay');
+  detailOverlay.addEventListener('click', e => { if (e.target === detailOverlay) closeDetailModal(); });
+  const renameOverlay = document.getElementById('renameOverlay');
+  renameOverlay.addEventListener('click', e => { if (e.target === renameOverlay) closeRenameModal(); });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeRenameModal();
+      closeDetailModal();
+    }
+  });
 }
 
 function boot() {

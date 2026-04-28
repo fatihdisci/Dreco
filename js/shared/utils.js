@@ -47,6 +47,67 @@ export function compressImage(file, maxDim) {
   });
 }
 
+export function sanitizeFilenamePart(input) {
+  return String(input || '')
+    .normalize('NFKC')
+    .replace(/[\\/:*?"<>|#%{}~&]/g, '-')
+    .replace(/\s+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^[-_.]+|[-_.]+$/g, '')
+    .slice(0, 80);
+}
+
+export function escapeHtml(input) {
+  return String(input || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+export function normalizeHttpUrl(raw) {
+  const value = String(raw || '').trim();
+  if (!value) return '';
+  const normalized = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value) ? value : `https://${value}`;
+  let url;
+  try {
+    url = new URL(normalized);
+  } catch (_) {
+    throw new Error('Geçersiz URL');
+  }
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('Sadece http:// veya https:// linkleri kabul edilir');
+  }
+  return url.toString();
+}
+
+export function getDomainFromUrl(urlStr) {
+  try {
+    const u = new URL(urlStr);
+    return u.hostname.replace(/^www\./, '');
+  } catch (_) {
+    return '';
+  }
+}
+
+export function filterResources(items, query = '', filter = 'Tümü') {
+  const q = String(query || '').trim().toLowerCase();
+  return items.filter(item => {
+    if (filter === 'Favoriler' && !item.favorite) return false;
+    if (filter !== 'Tümü' && filter !== 'Favoriler' && item.category !== filter) return false;
+    if (!q) return true;
+    const haystack = [
+      item.title,
+      item.url,
+      item.category,
+      item.note,
+      ...(item.tags || []),
+    ].join(' ').toLowerCase();
+    return haystack.includes(q);
+  });
+}
+
 let toastTimer;
 export function showToast(msg, type = '') {
   const t = document.getElementById('toast');
