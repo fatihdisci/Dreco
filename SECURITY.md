@@ -19,4 +19,7 @@ This project runs mostly on the client side, so API restrictions must be enforce
 
 ## Local token handling
 - Access token is stored in localStorage for session continuity.
+- Frontend-only Google Identity Services access tokens are not permanent; truly infinite sessions are not possible.
+- Use `prompt: ''` for normal sign-in/silent refresh flows; reserve `prompt: 'consent'` only when explicit re-consent is required.
+- Fully removing Google's unverified app warning requires OAuth Consent Screen verification, authorized domain setup, privacy policy, and terms configuration in Google Cloud.
 - If you later add user-generated HTML rendering, apply strict sanitization to prevent XSS.

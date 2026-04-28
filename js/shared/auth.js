@@ -35,7 +35,11 @@ export function initGIS(onAuthSuccess) {
     scope: SCOPES,
     callback: response => {
       if (response.error) {
-        showToast('Giriş başarısız: ' + response.error, 'error');
+        if (response.error === 'popup_closed_by_user') {
+          showToast('Giriş işlemi tamamlanmadı.', 'error');
+        } else {
+          showToast('Giriş başarısız: ' + response.error, 'error');
+        }
         if (state.pendingResolve) { state.pendingResolve(false); state.pendingResolve = null; }
         return;
       }
@@ -48,12 +52,23 @@ export function initGIS(onAuthSuccess) {
   });
 }
 
+function requestAccessTokenWithPrompt(prompt) {
+  if (!state.tokenClient) return false;
+  state.tokenClient.requestAccessToken({ prompt });
+  return true;
+}
+
 export function signIn() {
-  if (!state.tokenClient) {
-    showToast('Google servisleri yükleniyor, birkaç saniye bekleyip tekrar deneyin.', 'error');
+  if (!requestAccessTokenWithPrompt('')) {
+    showToast('Google servisleri yükleniyor, birkaç saniye sonra tekrar deneyin.', 'error');
     return;
   }
-  state.tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+export function signInWithAccountPicker() {
+  if (!requestAccessTokenWithPrompt('select_account')) {
+    showToast('Google servisleri yükleniyor, birkaç saniye sonra tekrar deneyin.', 'error');
+  }
 }
 
 export function signOutToLogin() {
@@ -90,12 +105,20 @@ export async function fetchUserInfo() {
 
 export async function ensureToken() {
   if (state.accessToken && Date.now() < state.tokenExpiry) return;
+
+  if (!state.tokenClient) {
+    showToast('Google oturumu yenilenemedi. Devam etmek için tekrar giriş yapın.', 'error');
+    signOutToLogin();
+    throw new Error('Google oturumu yenilenemedi');
+  }
+
   const ok = await new Promise(resolve => {
     state.pendingResolve = resolve;
-    state.tokenClient.requestAccessToken({ prompt: '' });
+    requestAccessTokenWithPrompt('');
   });
   if (!ok) {
+    showToast('Google oturumu yenilenemedi. Devam etmek için tekrar giriş yapın.', 'error');
     signOutToLogin();
-    throw new Error('Oturum süresi doldu, tekrar giriş yapın');
+    throw new Error('Google oturumu yenilenemedi');
   }
 }
