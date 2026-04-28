@@ -210,6 +210,65 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="detailOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Evrak Detayı</span>
+      <button class="modal-close" id="detailModalClose" aria-label="Kapat">
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
+          <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-preview">
+        <img id="detailPreviewImg" src="" alt="Evrak önizleme">
+        <div class="detail-preview-placeholder" id="detailPreviewPlaceholder">
+          <div class="empty-sub">Önizleme yükleniyor...</div>
+        </div>
+      </div>
+
+      <div class="detail-meta">
+        <div class="detail-row"><span>Dosya adı</span><strong id="detailFileName">—</strong></div>
+        <div class="detail-row"><span>Oluşturulma</span><strong id="detailCreatedAt">—</strong></div>
+        <div class="detail-row"><span>Tür</span><strong id="detailType">—</strong></div>
+        <div class="detail-row"><span>Ay</span><strong id="detailMonth">—</strong></div>
+      </div>
+
+      <div class="detail-actions">
+        <button class="capture-btn" id="detailOpenDriveBtn" data-detail-action>Drive'da Aç</button>
+        <button class="capture-btn" id="detailRenameBtn" data-detail-action>Yeniden Adlandır</button>
+      </div>
+      <button class="danger-btn" id="detailDeleteBtn" data-detail-action>Evrakı Sil</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="renameOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Yeniden Adlandır</span>
+      <button class="modal-close" id="renameModalClose" aria-label="Kapat">
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14">
+          <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <div class="input-label">Yeni Dosya Adı</div>
+        <input type="text" id="renameInput" class="text-input" placeholder="Yeni ad">
+      </div>
+      <div class="detail-actions">
+        <button class="capture-btn" id="renameCancelBtn">Vazgeç</button>
+        <button class="primary-btn" id="renameSaveBtn" data-detail-action>Kaydet</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="cameraInput" accept="image/*" capture="environment">
 <input type="file" id="galleryInput" accept="image/*">
 

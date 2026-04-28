@@ -79,7 +79,7 @@ export async function listFolder(folderId) {
   return withRetry(async () => {
     const q = `'${folderId}' in parents and trashed=false`;
     const r = await driveReq(
-      `https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=files(id,name,createdTime,thumbnailLink)&orderBy=createdTime&pageSize=200`
+      `https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=files(id,name,createdTime,thumbnailLink,webViewLink,mimeType)&orderBy=createdTime&pageSize=200`
     );
     return (await r.json()).files || [];
   });
@@ -100,4 +100,22 @@ export async function uploadFile(blob, folderId, name) {
 export async function downloadBlob(fileId) {
   const r = await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
   return r.blob();
+}
+
+export async function updateFileName(fileId, newName) {
+  const r = await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: newName }),
+  });
+  return r.json();
+}
+
+export async function trashFile(fileId) {
+  const r = await driveReq(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,trashed`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trashed: true }),
+  });
+  return r.json();
 }

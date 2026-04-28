@@ -1,8 +1,12 @@
 import { MONTHS_TR } from '../shared/config.js';
 import { state } from '../shared/state.js';
-import { toMonthKey, monthLabel, compressImage, showToast } from '../shared/utils.js';
-import { findFolder, getRootFolder, getTypeFolder, listFolder, uploadFile } from './drive.js';
+import { toMonthKey, monthLabel, compressImage, showToast, sanitizeFilenamePart } from '../shared/utils.js';
+import { findFolder, getRootFolder, getTypeFolder, listFolder, uploadFile, downloadBlob, updateFileName, trashFile } from './drive.js';
 import { runCropper } from './crop.js';
+
+let detailObjectUrl = null;
+let detailFile = null;
+let detailBusy = false;
 
 /* ── MONTH BAR ──────────────────────────────────────────────────────────── */
 export function buildMonthBar() {
@@ -116,6 +120,7 @@ function renderGrid(gelirFiles, giderFiles) {
       ? `<img src="${f.thumbnailLink}" alt="${f.name}" loading="lazy">`
       : `<div class="file-item-placeholder"><svg width="22" height="22" fill="none" viewBox="0 0 22 22"><rect x="3" y="2" width="16" height="18" rx="2" stroke="#000" stroke-width="2"/><path d="M7 9h8M7 13h5" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div>`;
     el.innerHTML += `<div class="file-badge ${f.type}">${f.type === 'gelir' ? arrowUp : arrowDown}</div>`;
+    el.addEventListener('click', () => openDetailModal(f));
     grid.appendChild(el);
   });
 }
@@ -170,16 +175,6 @@ function showPreviewFromBlobOrFile(source) {
   document.getElementById('previewPlaceholder').style.display = 'none';
 }
 
-
-function sanitizeFilenamePart(input) {
-  return String(input || '')
-    .normalize('NFKC')
-    .replace(/[\\/:*?"<>|#%{}~&]/g, '-')
-    .replace(/\s+/g, '_')
-    .replace(/_+/g, '_')
-    .replace(/^[-_.]+|[-_.]+$/g, '')
-    .slice(0, 80);
-}
 
 export function previewFile(file) {
   if (!file) return;
@@ -239,3 +234,125 @@ export async function saveEvrak() {
 /* ── PDF MODAL ──────────────────────────────────────────────────────────── */
 export function openPdfModal()  { document.getElementById('pdfOverlay').classList.add('open'); }
 export function closePdfModal() { document.getElementById('pdfOverlay').classList.remove('open'); }
+
+function setDetailBusy(busy) {
+  detailBusy = busy;
+  document.querySelectorAll('[data-detail-action]').forEach(el => {
+    el.disabled = busy;
+  });
+}
+
+function splitNameAndExt(filename) {
+  const idx = filename.lastIndexOf('.');
+  if (idx <= 0) return { base: filename, ext: '' };
+  return { base: filename.slice(0, idx), ext: filename.slice(idx) };
+}
+
+async function loadDetailPreview(file) {
+  const img = document.getElementById('detailPreviewImg');
+  const placeholder = document.getElementById('detailPreviewPlaceholder');
+  img.style.display = 'none';
+  placeholder.style.display = 'flex';
+  if (detailObjectUrl) {
+    URL.revokeObjectURL(detailObjectUrl);
+    detailObjectUrl = null;
+  }
+
+  if (!file?.id) return;
+  try {
+    const blob = await downloadBlob(file.id);
+    detailObjectUrl = URL.createObjectURL(blob);
+    img.src = detailObjectUrl;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+  } catch (_) {
+    if (file.thumbnailLink) {
+      img.src = file.thumbnailLink;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+    }
+  }
+}
+
+export function closeDetailModal() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  if (detailObjectUrl) {
+    URL.revokeObjectURL(detailObjectUrl);
+    detailObjectUrl = null;
+  }
+  detailFile = null;
+  setDetailBusy(false);
+}
+
+export async function openDetailModal(file) {
+  detailFile = { ...file };
+  const overlay = document.getElementById('detailOverlay');
+  const dt = detailFile.createdTime ? new Date(detailFile.createdTime) : null;
+  document.getElementById('detailFileName').textContent = detailFile.name || '—';
+  document.getElementById('detailCreatedAt').textContent = dt ? dt.toLocaleString('tr-TR') : '—';
+  document.getElementById('detailType').textContent = detailFile.type === 'gelir' ? 'Gelir' : 'Gider';
+  document.getElementById('detailMonth').textContent = monthLabel(state.currentMonthKey);
+  overlay.classList.add('open');
+  setDetailBusy(false);
+  await loadDetailPreview(detailFile);
+}
+
+export function openRenameModal() {
+  if (!detailFile || detailBusy) return;
+  const { base } = splitNameAndExt(detailFile.name || '');
+  document.getElementById('renameInput').value = base;
+  document.getElementById('renameOverlay').classList.add('open');
+}
+
+export function closeRenameModal() {
+  document.getElementById('renameOverlay').classList.remove('open');
+}
+
+export async function submitRename() {
+  if (!detailFile || detailBusy) return;
+  const raw = document.getElementById('renameInput').value;
+  const safeBase = sanitizeFilenamePart(raw);
+  if (!safeBase) { showToast('Dosya adı boş olamaz', 'error'); return; }
+
+  const { ext } = splitNameAndExt(detailFile.name || '');
+  const newName = `${safeBase}${ext}`;
+  setDetailBusy(true);
+  try {
+    const updated = await updateFileName(detailFile.id, newName);
+    detailFile.name = updated.name || newName;
+    document.getElementById('detailFileName').textContent = detailFile.name;
+    closeRenameModal();
+    await loadFiles();
+    showToast('Dosya adı güncellendi', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('Yeniden adlandırma başarısız', 'error');
+  } finally {
+    setDetailBusy(false);
+  }
+}
+
+export function openFileInDrive() {
+  if (!detailFile?.webViewLink || detailBusy) {
+    showToast('Drive bağlantısı bulunamadı', 'error');
+    return;
+  }
+  window.open(detailFile.webViewLink, '_blank', 'noopener,noreferrer');
+}
+
+export async function deleteFileFromDetail() {
+  if (!detailFile || detailBusy) return;
+  const ok = window.confirm('Bu evrakı çöp kutusuna taşımak istiyor musunuz?');
+  if (!ok) return;
+  setDetailBusy(true);
+  try {
+    await trashFile(detailFile.id);
+    showToast('Evrak çöp kutusuna taşındı', 'success');
+    closeDetailModal();
+    await loadFiles();
+  } catch (e) {
+    console.error(e);
+    showToast('Silme başarısız oldu', 'error');
+    setDetailBusy(false);
+  }
+}
